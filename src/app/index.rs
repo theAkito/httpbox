@@ -4,6 +4,7 @@ use askama::Template;
 use gotham::error::Result;
 use gotham::handler::{Handler, HandlerFuture, IntoHandlerFuture, NewHandler};
 use gotham::state::State;
+use std::pin::Pin;
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -15,7 +16,7 @@ struct IndexTemplate<'a> {
 pub struct Index(String);
 
 impl Handler for Index {
-    fn handle(self, state: State) -> Box<HandlerFuture> {
+    fn handle(self, state: State) -> Pin<Box<HandlerFuture>> {
         html(state, self.0).into_handler_future()
     }
 }

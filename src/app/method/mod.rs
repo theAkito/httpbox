@@ -6,6 +6,7 @@ use crate::http::{Response, Uri};
 use gotham::handler::HandlerFuture;
 use gotham::state::{FromState, State};
 use itertools::{Either, Itertools};
+use std::pin::Pin;
 use url::form_urlencoded;
 
 pub fn get(state: State) -> (State, Response) {
@@ -26,19 +27,19 @@ pub fn get(state: State) -> (State, Response) {
     ok(state, body)
 }
 
-pub fn post(state: State) -> Box<HandlerFuture> {
+pub fn post(state: State) -> Pin<Box<HandlerFuture>> {
     body(state)
 }
 
-pub fn put(state: State) -> Box<HandlerFuture> {
+pub fn put(state: State) -> Pin<Box<HandlerFuture>> {
     body(state)
 }
 
-pub fn patch(state: State) -> Box<HandlerFuture> {
+pub fn patch(state: State) -> Pin<Box<HandlerFuture>> {
     body(state)
 }
 
-pub fn delete(state: State) -> Box<HandlerFuture> {
+pub fn delete(state: State) -> Pin<Box<HandlerFuture>> {
     body(state)
 }
 

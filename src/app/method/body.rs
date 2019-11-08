@@ -2,7 +2,6 @@ use crate::app::response::ok;
 use crate::headers::{ContentType, HeaderMapExt};
 use crate::http::{Body, Chunk, HeaderMap};
 use failure::Fallible;
-use futures::compat::Stream01CompatExt;
 use futures::prelude::*;
 use gotham::state::{FromState, State};
 use gotham_async::async_handler;
@@ -47,10 +46,7 @@ fn parse_body(state: &State, chunk: &Chunk) -> Fallible<String> {
 
 #[async_handler]
 pub async fn body(mut state: State) -> (State, Response) {
-    let body = etry!(
-        state,
-        Body::take_from(&mut state).compat().try_concat().await
-    );
+    let body = etry!(state, Body::take_from(&mut state).try_concat().await);
     let content =
         etry!(state, parse_body(&state, &body).map_err(|e| e.compat()));
     ok(state, content)

@@ -13,22 +13,16 @@ pub fn async_handler(_: TokenStream, item: TokenStream) -> TokenStream {
     let params = input.sig.inputs;
 
     let tokens = quote! {
-        #vis fn #ident(#params) -> Box<::gotham::handler::HandlerFuture> {
-            Box::new(
-                ::futures::future::TryFutureExt::compat(
-                    ::futures::future::FutureExt::boxed(
-                        ::futures::future::FutureExt::then(
-                            async move {
-                               #body
-                            }, |result| {
-                                ::futures::compat::Future01CompatExt::compat(
-                                    ::gotham::handler::IntoHandlerFuture::into_handler_future(
-                                        result
-                                    )
-                                )
-                            }
+        #vis fn #ident(#params) -> ::std::pin::Pin<Box<::gotham::handler::HandlerFuture>> {
+            ::futures::future::FutureExt::boxed(
+                ::futures::future::FutureExt::then(
+                    async move {
+                       #body
+                    }, |result| {
+                        ::gotham::handler::IntoHandlerFuture::into_handler_future(
+                            result
                         )
-                    )
+                    }
                 )
             )
         }
