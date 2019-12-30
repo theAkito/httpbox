@@ -1,8 +1,7 @@
 use crate::app::response::ok;
 use crate::headers::{ContentType, HeaderMapExt};
-use crate::http::{Body, Chunk, HeaderMap};
+use crate::http::{body, Body, Bytes, HeaderMap};
 use failure::Fallible;
-use futures::prelude::*;
 use gotham::state::{FromState, State};
 use gotham_async::async_handler;
 use itertools::Itertools;
@@ -37,7 +36,7 @@ fn content_type_decoder(state: &State) -> ContentTypeDecoder {
     }
 }
 
-fn parse_body(state: &State, chunk: &Chunk) -> Fallible<String> {
+fn parse_body(state: &State, chunk: &Bytes) -> Fallible<String> {
     match content_type_decoder(&state) {
         ContentTypeDecoder::UrlEncoded => Ok(parse_url_encoded_body(&chunk)?),
         ContentTypeDecoder::Raw => Ok(str::from_utf8(&chunk[..])?.to_string()),
@@ -46,7 +45,7 @@ fn parse_body(state: &State, chunk: &Chunk) -> Fallible<String> {
 
 #[async_handler]
 pub async fn body(mut state: State) -> (State, Response) {
-    let body = etry!(state, Body::take_from(&mut state).try_concat().await);
+    let body = etry!(state, body::to_bytes(Body::take_from(&mut state)).await);
     let content =
         etry!(state, parse_body(&state, &body).map_err(|e| e.compat()));
     ok(state, content)

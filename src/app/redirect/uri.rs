@@ -30,7 +30,7 @@ fn host_from_headers(state: &State) -> Fallible<Url> {
 }
 
 fn absolute_uri(state: &State, uri: Uri) -> Fallible<Uri> {
-    if uri.scheme_part().is_some() {
+    if uri.scheme().is_some() {
         Ok(uri)
     } else {
         let base = match BASE_URL.clone() {
